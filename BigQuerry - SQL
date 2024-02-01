@@ -767,34 +767,213 @@ BEGIN END
 BEGIN initiates a block of statements where declared variables exist only until only until the corresponding END.
 sql_statement_list is a list of zero or more SQL statements ending with semicolons.
 
-#BASIC EXAMPLE
 #1º EXAMPLE
-#2º EXAMPLE
+CREATE PROCEDURE ExampleProcedure()
+BEGIN
+  -- SQL statements or procedural code go here
+
+  -- For example:
+  SELECT column1, column2
+  FROM your_table
+  WHERE some_condition;
+
+  -- More code...
+END;
 ----------------------------------------------------------------------------------------------------
+CASE
+The CASE statement in SQL is used to perform conditional logic within a query. It allows you to conditionally execute 
+expressions and return different values based on specified conditions. 
+The CASE statement can be used in various contexts such as within a SELECT, UPDATE, SET, or ORDER BY clause.
 
 #BASIC EXAMPLE
+SELECT
+  column1,
+  column2,
+  CASE
+    WHEN condition1 THEN 'Result1'
+    WHEN condition2 THEN 'Result2'
+    ELSE 'DefaultResult'
+  END AS custom_column
+FROM your_table;
+
 #1º EXAMPLE
-#2º EXAMPLE
+UPDATE your_table
+SET status = 
+  CASE
+    WHEN condition1 THEN 'Active'
+    WHEN condition2 THEN 'Inactive'
+    ELSE 'Unknown'
+  END
+WHERE some_condition;
 ----------------------------------------------------------------------------------------------------
+IF
+
+In SQL, the IF statement is often used in control-flow constructs within procedural programming languages like PL/pgSQL (PostgreSQL), 
+PL/SQL (Oracle), or T-SQL (Microsoft SQL Server). However, the standard SQL language itself does not have a standalone IF statement for control flow.
+Instead, the CASE statement is used for similar purposes.
+
+#1º EXAMPLE
+SELECT
+  column1,
+  column2,
+  CASE
+    WHEN condition1 THEN 'Result1'
+    WHEN condition2 THEN 'Result2'
+    ELSE 'DefaultResult'
+  END AS custom_column
+FROM your_table;
+----------------------------------------------------------------------------------------------------
+LABELS
+In SQL, labels are not used in the same way they are in some procedural programming languages. 
+Labels are typically associated with control-flow statements like loops or conditional blocks in languages such as PL/pgSQL, PL/SQL, or T-SQL. 
+In standard SQL, the use of labels is not part of the language.
+
+#1º EXAMPLE
+DO $$ 
+DECLARE
+  i INT := 1;
+BEGIN
+  <<my_label>>
+  LOOP
+    -- Some logic here
+    
+    IF i = 5 THEN
+      EXIT my_label; -- Exit the loop when i equals 5
+    END IF;
+    
+    i := i + 1;
+  END LOOP my_label;
+END $$;
+----------------------------------------------------------------------------------------------------
+REPEAT
+The REPEAT statement is used in some procedural SQL languages to create loops that repeat until a certain condition is met. 
+It is typically used in languages like PL/pgSQL (PostgreSQL), PL/SQL (Oracle), or T-SQL (Microsoft SQL Server). 
+The standard SQL language itself does not have a REPEAT statement.
+
+#1º EXAMPLE
+DO $$ 
+DECLARE
+  i INT := 1;
+BEGIN
+  REPEAT
+    -- Some logic here
+    
+    IF i = 5 THEN
+      EXIT; -- Exit the loop when i equals 5
+    END IF;
+    
+    i := i + 1;
+  UNTIL FALSE;
+END $$;
+
+----------------------------------------------------------------------------------------------------
+WHILE
+The WHILE loop is another control-flow construct used in some procedural SQL languages to repeatedly execute a block of code as long as a specified condition is true. 
+Like REPEAT, the WHILE loop is commonly found in procedural languages such as PL/pgSQL (PostgreSQL), PL/SQL (Oracle), or T-SQL (Microsoft SQL Server).
+
+#1º EXAMPLE
+DO $$ 
+DECLARE
+  i INT := 1;
+BEGIN
+  WHILE i <= 5 LOOP
+    -- Some logic here
+    RAISE NOTICE 'Value of i: %', i;
+    
+    i := i + 1;
+  END LOOP;
+END $$;
+----------------------------------------------------------------------------------------------------
+LEAVE
+In some procedural SQL languages, the LEAVE statement is used to exit or break out of a loop or block of code prematurely. 
+It is typically used in conjunction with loop constructs like WHILE, REPEAT, or labeled blocks. 
+However, it's important to note that the LEAVE statement is not part of the standard SQL language.
+
+#1º EXAMPLE
+DO $$ 
+DECLARE
+  i INT := 1;
+BEGIN
+  REPEAT
+    -- Some logic here
+    
+    IF i = 5 THEN
+      EXIT; -- Exit the loop when i equals 5
+    END IF;
+    
+    i := i + 1;
+  UNTIL FALSE;
+END $$;
+----------------------------------------------------------------------------------------------------
+LEAVE and BREAK
+In some procedural SQL languages, the LEAVE statement is used to exit a labeled loop, and the BREAK statement may be used for a similar purpose in other languages. 
+However, it's important to note that the availability and syntax of these statements can vary between different procedural languages.
+
+#1º EXAMPLE
+DO $$ 
+DECLARE
+  i INT := 1;
+BEGIN
+  my_label: WHILE i <= 10 LOOP
+    -- Some logic here
+    
+    IF i = 5 THEN
+      LEAVE my_label; -- Exit the labeled loop when i equals 5
+    END IF;
+    
+    RAISE NOTICE 'Value of i: %', i;
+    
+    i := i + 1;
+  END LOOP my_label;
+END $$;
+-----------------------------------------------------------------------------------
+CONTINUE
+In SQL, the CONTINUE statement is not a standard construct, and its usage can vary depending on the specific procedural language or 
+database system you are working with. Unlike some other programming languages, SQL procedural languages like PL/pgSQL (PostgreSQL), PL/SQL (Oracle), 
+or T-SQL (Microsoft SQL Server) may not have a dedicated CONTINUE statement.
+
+#1º EXAMPLE
+DO $$ 
+DECLARE
+  i INT := 1;
+BEGIN
+  WHILE i <= 5 LOOP
+    -- Some logic here
+    
+    IF i = 3 THEN
+      i := i + 1;
+      CONTINUE; -- Skip the rest of the loop for i = 3
+    END IF;
+    
+    RAISE NOTICE 'Value of i: %', i;
+    
+    i := i + 1;
+  END LOOP;
+END $$;
+----------------------------------------------------------------------------------------------------
+FOR
+The FOR loop is commonly used in procedural SQL languages to iterate over a range of values or a result set. 
+The specific syntax and behavior can vary between different procedural languages and database systems.
 
 #BASIC EXAMPLE
-#1º EXAMPLE
-#2º EXAMPLE
-----------------------------------------------------------------------------------------------------
+DO $$ 
+DECLARE
+  i INT;
+BEGIN
+  FOR i IN 1..5 LOOP
+    -- Some logic here
+    RAISE NOTICE 'Value of i: %', i;
+  END LOOP;
+END $$;
 
-#BASIC EXAMPLE
 #1º EXAMPLE
-#2º EXAMPLE
-----------------------------------------------------------------------------------------------------
+BEGIN
+  FOR i IN 1..5 LOOP
+    -- Some logic here
+    DBMS_OUTPUT.PUT_LINE('Value of i: ' || i);
+  END LOOP;
+END;
 
-#BASIC EXAMPLE
-#1º EXAMPLE
-#2º EXAMPLE
-----------------------------------------------------------------------------------------------------
-
-#BASIC EXAMPLE
-#1º EXAMPLE
-#2º EXAMPLE
 ----------------------------------------------------------------------------------------------------
 
 
