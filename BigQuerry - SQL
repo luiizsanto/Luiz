@@ -314,17 +314,488 @@ A palavra-chave FULL OUTER JOIN retorna todos os registros correspondentes de am
 corresponder ou não. Portanto,se houver linhas em "Clientes"que não tenham correspondências em "Pedidos", ou se houver linhas
 em "Pedidos" que não tenham correspondências em "Clientes", essas linhas também serão listadas.
 
+WITH A AS (
+  SELECT *
+  FROM UNNEST (ARRAY<STRUCT<w INT64, x STRING>>[(1,'a'),(2,'b'),(3,'c'),(4,'d')])
+),
 
+B AS (
+  SELECT *
+  FROM UNNEST (ARRAY<STRUCT<y INT64, z STRING>>[(2,'K'),(3,'M'),(3,'c'),(4,'P')])
+)
 
+SELECT *
+FROM A
+FULL OUTER JOIN B ON A.w = B.y;
+-----------------------------------------------------------------------------------------------------------------------
+LEFT OUTER JOIN 
+é um tipo de junção em SQL que combina linhas de duas tabelas com base em umacondição de junção e 
+retorna todas as linhas da tabela à esquerda (tabela A) e as linhas correspondentes da tabela à direita (tabela B)
 
+WITH A AS (
+  SELECT *
+  FROM UNNEST (ARRAY<STRUCT<w INT64, x STRING>>[(1,'a'),(2,'b'),(3,'c'),(4,'d')])
+),
 
+B AS (
+  SELECT *
+  FROM UNNEST (ARRAY<STRUCT<y INT64, z STRING>>[(2,'k'),(3,'m'),(3,'c'),(4,'p')])
+)
 
+SELECT *
+FROM A
+LEFT OUTER JOIN B ON A.w = B.y;
+-----------------------------------------------------------------------------------------------------------------------
+RIGHT OUTER JOIN - INVERSO DE RIGHT OUTER JOIN
 
+WITH A AS (
+  SELECT *
+  FROM UNNEST (ARRAY<STRUCT<w INT64, x STRING>>[(1,'a'),(2,'b'),(3,'c'),(4,'d')])
+),
 
+B AS (
+  SELECT *
+  FROM UNNEST (ARRAY<STRUCT<y INT64, z STRING>>[(2,'K'),(3,'M'),(3,'c'),(4,'P')])
+)
 
+SELECT *
+FROM A
+RIGHT OUTER JOIN B ON A.w = B.y;
+-----------------------------------------------------------------------------------------------------------------------
+ON x USING
 
+The USING clause is used if several columns share the same name but you don’t want to join using all of these common
+columns. The columns listed in the USING clause can’t have any qualifiers in the statement, including the WHERE clause:
 
+-- Using ON clause
+SELECT *
+FROM employees
+JOIN departments ON employees.department_id = departments.department_id;
 
+-- Using USING clause
+SELECT *
+FROM employees
+JOIN departments USING (department_id);
+-----------------------------------------------------------------------------------------------------------------------
+JOIN operations in a sequence 
+
+WITH A AS (
+  SELECT *
+  FROM UNNEST (ARRAY<STRUCT<w INT64, x STRING>>[(1,'a'),(2,'b'),(3,'c'),(4,'d')])
+),
+
+B AS (
+  SELECT *
+  FROM UNNEST (ARRAY<STRUCT<y INT64, z STRING>>[(2,'K'),(3,'M'),(3,'c'),(4,'P')])
+),
+
+C AS (
+  SELECT *
+  FROM UNNEST (ARRAY<STRUCT<w INT64, x STRING>>[(1,'q'),(2,'q'),(3,'s'),(4,'s')])
+)
+
+SELECT *
+FROM A
+INNER JOIN B ON A.w = B.y
+INNER JOIN C ON A.w = C.w;
+-----------------------------------------------------------------------------------------------------------------------
+WHERE
+The WHERE clause in SQL is used to filter rows from the result set based on a specified condition.
+It is typically used in conjunction with the SELECT statement, but it can also be used with other statements like UPDATE, DELETE, and INSERT
+
+#BASIC EXAMPLE
+SELECT column1, column2, ...
+FROM your_table
+WHERE your_condition;
+
+#1º EXEMPLO
+SELECT employee_id, first_name, last_name, salary
+FROM employees
+WHERE salary > 50000;
+
+#2º EXAMPLE
+WITH A AS (
+  SELECT *
+  FROM UNNEST (ARRAY<STRUCT<w INT64, x STRING>>[(1,'a'),(2,'b'),(3,'c'),(4,'d')])
+),
+
+B AS (
+  SELECT *
+  FROM UNNEST (ARRAY<STRUCT<y INT64, z STRING>>[(2,'K'),(3,'M'),(3,'c'),(4,'P')])
+),
+
+C AS (
+  SELECT *
+  FROM UNNEST (ARRAY<STRUCT<w INT64, x STRING>>[(1,'q'),(2,'q'),(3,'s'),(4,'s')])
+)
+
+SELECT *
+FROM A
+INNER JOIN B ON A.w = B.y
+INNER JOIN C ON A.w = C.w
+WHERE A.w > 2;
+-----------------------------------------------------------------------------------------------------------------------
+GROUP BY ROLLUP
+
+#BASIC EXAMPLE
+SELECT column1, column2, aggregate_function(column3)
+FROM your_table
+GROUP BY ROLLUP (column1, column2);
+
+#1º EXAMPLE
+SELECT region, product, SUM(sales_amount) as total_sales
+FROM sales
+GROUP BY ROLLUP (region, product);
+
+#2º EXAMPLE
+WITH A AS (
+  SELECT *
+  FROM UNNEST (ARRAY<STRUCT<w INT64, x STRING>>[(1,'a'),(2,'b'),(3,'c'),(4,'d')])
+),
+
+B AS (
+  SELECT *
+  FROM UNNEST (ARRAY<STRUCT<y INT64, z STRING>>[(2,'K'),(3,'M'),(3,'c'),(4,'P')])
+),
+
+C AS (
+  SELECT *
+  FROM UNNEST (ARRAY<STRUCT<w INT64, x STRING>>[(1,'q'),(2,'q'),(3,'s'),(4,'s')])
+)
+
+SELECT A.w, B.z, COUNT(*) as count_B
+FROM A
+INNER JOIN B ON A.w = B.y
+INNER JOIN C ON A.w = C.w
+GROUP BY ROLLUP (A.w, B.z);
+----------------------------------------------------------------------------------------------------
+GROUP BY 
+The GROUP BY clause in SQL is used to group rows that have the same values in specified columns into summary rows,
+like "total" or "average". It is often used in conjunction with aggregate functions like SUM, COUNT, AVG, etc.
+
+#BASIC EXAMPLE
+SELECT column1, aggregate_function(column2)
+FROM your_table
+GROUP BY column1;
+
+#1º EXAMPLE
+SELECT product_id, SUM(sales_amount) as total_sales
+FROM sales
+GROUP BY product_id;
+
+#2º EXAMPLE
+WITH A AS (
+  SELECT *
+  FROM UNNEST (ARRAY<STRUCT<w INT64, x STRING>>[(1,'a'),(2,'b'),(3,'c'),(4,'d')])
+),
+
+B AS (
+  SELECT *
+  FROM UNNEST (ARRAY<STRUCT<y INT64, z STRING>>[(2,'K'),(3,'M'),(3,'c'),(4,'P')])
+),
+
+C AS (
+  SELECT *
+  FROM UNNEST (ARRAY<STRUCT<w INT64, x STRING>>[(1,'q'),(2,'q'),(3,'s'),(4,'s')])
+)
+
+SELECT A.w, COUNT(*) as count_B, MAX(C.x) as max_x
+FROM A
+INNER JOIN B ON A.w = B.y
+INNER JOIN C ON A.w = C.w
+GROUP BY A.w;
+----------------------------------------------------------------------------------------------------
+HAVING
+The HAVING clause in SQL is used to filter the results of a GROUP BY query based on a specified condition.
+It is similar to the WHERE clause, but while WHERE filters individual rows before they are grouped and aggregated,
+HAVING filters the results after they have been grouped.
+
+#BASIC EXAMPLE
+SELECT column1, aggregate_function(column2)
+FROM your_table
+GROUP BY column1
+HAVING your_condition;
+
+#1º EXAMPLE
+SELECT product_id, SUM(sales_amount) as total_sales
+FROM sales
+GROUP BY product_id
+HAVING total_sales > 1000;
+
+#2º EXAMPLE
+SELECT product_id, SUM(sales_amount) as total_sales
+FROM sales
+GROUP BY product_id
+HAVING total_sales > 1000;
+----------------------------------------------------------------------------------------------------
+ORDER BY
+The ORDER BY clause in SQL is used to sort the result set of a query based on one or more columns.
+It is typically used in conjunction with the SELECT statement.
+
+#BASIC EXAMPLE
+SELECT column1, column2
+FROM your_table
+ORDER BY column1 ASC, column2 DESC;
+
+#1º EXAMPLE
+WITH A AS (
+  SELECT *
+  FROM UNNEST (ARRAY<STRUCT<w INT64, x STRING>>[(1,'a'),(2,'b'),(3,'c'),(4,'d')])
+),
+
+B AS (
+  SELECT *
+  FROM UNNEST (ARRAY<STRUCT<y INT64, z STRING>>[(2,'K'),(3,'M'),(3,'c'),(4,'P')])
+),
+
+C AS (
+  SELECT *
+  FROM UNNEST (ARRAY<STRUCT<w INT64, x STRING>>[(1,'q'),(2,'q'),(3,'s'),(4,'s')])
+)
+
+SELECT A.w, COUNT(*) as count_B
+FROM A
+INNER JOIN B ON A.w = B.y
+INNER JOIN C ON A.w = C.w
+GROUP BY A.w
+HAVING COUNT(*) > 1
+ORDER BY A.w DESC;
+----------------------------------------------------------------------------------------------------
+The ORDER BY clause in SQL is used to sort the result set of a query based on one or more columns. 
+It is typically used in conjunction with the SELECT statement.
+
+#BASIC EXAMPLE
+SELECT
+  column1,
+  column2,
+  ROW_NUMBER() OVER (PARTITION BY column1 ORDER BY column2) as row_num
+FROM
+  your_table
+QUALIFY row_num = 1;
+
+#1º EXAMPLE
+WITH A AS (
+  SELECT *
+  FROM UNNEST (ARRAY<STRUCT<w INT64, x STRING>>[(1,'a'),(2,'b'),(3,'c'),(4,'d')])
+),
+
+B AS (
+  SELECT *
+  FROM UNNEST (ARRAY<STRUCT<y INT64, z STRING>>[(2,'K'),(3,'M'),(3,'c'),(4,'P')])
+),
+
+C AS (
+  SELECT *
+  FROM UNNEST (ARRAY<STRUCT<w INT64, x STRING>>[(1,'q'),(2,'q'),(3,'s'),(4,'s')])
+)
+
+SELECT
+  A.w,
+  B.z,
+  COUNT(*) OVER (PARTITION BY A.w) as count_B
+FROM
+  A
+INNER JOIN
+  B ON A.w = B.y
+INNER JOIN
+  C ON A.w = C.w
+QUALIFY count_B > 1;
+----------------------------------------------------------------------------------------------------
+WINDOW
+In SQL, the WINDOW clause is used in conjunction with window functions to define the window specification for the function. 
+The window specification determines the set of rows within which the window function operates. 
+Window functions perform a calculation across a set of table rows that are somehow related to the current row.
+
+#1º EXAMPLE
+SELECT
+  column1,
+  column2,
+  SUM(column2) OVER w AS running_total
+FROM
+  your_table
+WINDOW w AS (ORDER BY column1);
+
+#2º EXAMPLE
+WITH A AS (
+  SELECT *
+  FROM UNNEST (ARRAY<STRUCT<w INT64, x STRING>>[(1,'a'),(2,'b'),(3,'c'),(4,'d')])
+),
+
+B AS (
+  SELECT *
+  FROM UNNEST (ARRAY<STRUCT<y INT64, z STRING>>[(2,'K'),(3,'M'),(3,'c'),(4,'P')])
+),
+
+C AS (
+  SELECT *
+  FROM UNNEST (ARRAY<STRUCT<w INT64, x STRING>>[(1,'q'),(2,'q'),(3,'s'),(4,'s')])
+)
+
+SELECT
+  A.w,
+  B.z,
+  COUNT(*) OVER w AS count_B
+FROM
+  A
+INNER JOIN
+  B ON A.w = B.y
+INNER JOIN
+  C ON A.w = C.w
+WINDOW w AS (PARTITION BY A.w);
+----------------------------------------------------------------------------------------------------
+UNION/INTERSECT/EXCEPT
+The UNION operator in SQL is used to combine the result sets of two or more SELECT statements into a single result set.
+It removes duplicate rows from the combined result set by default. 
+Each SELECT statement within the UNION must have the same number of columns in the result sets with similar data types.
+
+#BASIC EXAMPLE
+SELECT column1, column2 FROM table1
+UNION #or intersect or except
+SELECT column1, column2 FROM table2;
+
+#1º EXAMPLE
+WITH A AS (
+  SELECT *
+  FROM UNNEST (ARRAY<STRUCT<w INT64, x STRING>>[(1,'a'),(2,'b'),(3,'c'),(4,'d')])
+),
+
+B AS (
+  SELECT *
+  FROM UNNEST (ARRAY<STRUCT<y INT64, z STRING>>[(2,'K'),(3,'M'),(3,'c'),(4,'P')])
+)
+
+-- Combine results of CTE A and CTE B using UNION
+SELECT w, x FROM A
+UNION
+SELECT y, z FROM B;
+----------------------------------------------------------------------------------------------------
+LIMIT
+The LIMIT and OFFSET clauses in SQL are used together to achieve pagination in query results.
+They help control the number of rows returned and specify the starting point for fetching rows. 
+LIMIT sets the maximum number of rows to be returned, and OFFSET specifies the number of rows to skip from the beginning.
+
+#BASIC EXAMPLE
+SELECT column1, column2
+FROM your_table
+ORDER BY some_column
+LIMIT 10
+OFFSET 20;
+----------------------------------------------------------------------------------------------------
+WITH
+The WITH clause in SQL is used to define Common Table Expressions (CTEs). A CTE is a temporary result set that can be 
+referenced within the context of a larger SQL query, allowing you to break down complex queries into more manageable parts.
+
+#BASIC EXAMPLE
+WITH CTE_name (column1, column2) AS (
+  SELECT column1, column2
+  FROM your_table
+  WHERE some_condition
+)
+SELECT *
+FROM CTE_name;
+----------------------------------------------------------------------------------------------------
+WITH RECURSIVE
+The WITH RECURSIVE clause in SQL is an extension of the WITH clause that allows you to define a recursive common table expression (CTE).
+Recursive CTEs are useful when dealing with hierarchical or graph-like data structures, where a query needs to refer to its own output in a recursive manner.
+
+#1º EXAMPLE
+WITH RECURSIVE Numbers(n) AS (
+  SELECT 1
+  UNION
+  SELECT n + 1 FROM Numbers WHERE n < 5
+)
+SELECT * FROM Numbers;
+
+#2º EXAMPLE
+WITH RECURSIVE HierarchicalData(id, parent_id, name, depth) AS (
+  SELECT id, parent_id, name, 0 AS depth
+  FROM your_table
+  WHERE parent_id IS NULL
+
+  UNION ALL
+
+  SELECT child.id, child.parent_id, child.name, parent.depth + 1
+  FROM your_table child
+  JOIN HierarchicalData parent ON child.parent_id = parent.id
+)
+SELECT id, parent_id, name, depth
+FROM HierarchicalData;
+
+----------------------------------------------------------------------------------------------------
+DECLARE
+The DECLARE keyword in SQL is typically used within stored procedures, functions, or triggers to declare local variables.
+These local variables are used to store temporary values and facilitate operations within the scope of the stored procedure or function.
+
+#BASIC EXAMPLE
+CREATE PROCEDURE ExampleProcedure()
+BEGIN
+  DECLARE variable_name INT;
+  SET variable_name = 42;
+
+  -- Rest of the procedure logic using the declared variable
+END;
+
+#1º EXAMPLE
+#Declare a variable
+DECLARE X INT64;
+
+#Set value for the variable
+SET X = 10;
+
+#Use the variable
+SELECT X+1 AS NUM;
+----------------------------------------------------------------------------------------------------
+EXECUTE IMMEADIATE 
+The EXECUTE IMMEDIATE statement is used in some SQL databases to dynamically execute a SQL statement or a SQL block that is represented as a string. 
+This allows you to construct and execute SQL statements on the fly, which can be useful in certain 
+
+#1º EXAMPLE
+DECLARE
+  sql_statement VARCHAR(100);
+  result_value INT;
+BEGIN
+  sql_statement := 'SELECT COUNT(*) FROM your_table WHERE some_condition';
+  EXECUTE IMMEDIATE sql_statement INTO result_value;
+  DBMS_OUTPUT.PUT_LINE('Result: ' || result_value);
+END;
+
+#2º EXAMPLE
+DECLARE Y FLOAT64;
+EXECUTE IMMEDIATE "SELECT ? * (? + 2)" INTO Y USING 1, 3;
+----------------------------------------------------------------------------------------------------
+BEGIN END
+BEGIN initiates a block of statements where declared variables exist only until only until the corresponding END.
+sql_statement_list is a list of zero or more SQL statements ending with semicolons.
+
+#BASIC EXAMPLE
+#1º EXAMPLE
+#2º EXAMPLE
+----------------------------------------------------------------------------------------------------
+
+#BASIC EXAMPLE
+#1º EXAMPLE
+#2º EXAMPLE
+----------------------------------------------------------------------------------------------------
+
+#BASIC EXAMPLE
+#1º EXAMPLE
+#2º EXAMPLE
+----------------------------------------------------------------------------------------------------
+
+#BASIC EXAMPLE
+#1º EXAMPLE
+#2º EXAMPLE
+----------------------------------------------------------------------------------------------------
+
+#BASIC EXAMPLE
+#1º EXAMPLE
+#2º EXAMPLE
+----------------------------------------------------------------------------------------------------
+
+#BASIC EXAMPLE
+#1º EXAMPLE
+#2º EXAMPLE
+----------------------------------------------------------------------------------------------------
 
 
 
