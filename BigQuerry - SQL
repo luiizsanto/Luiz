@@ -3,6 +3,12 @@ SQL (Structured Query Language) - linguagem de programação para armazenar e pr
 Access: console.cloud.google.com/bigquery
 É possível acessae dados públicos
 
+SITES PARA TREINAR SQL E OUTRAS LINGUAGENS: 
+CoodWars: https://www.codewars.com/
+Exercism: https://exercism.org/
+Breecrowd: https://www.beecrowd.com.br/judge/en/login
+
+
 Comandos:
 -----------------------------------------------------------------------------------------------------------------------
 SELECT - select a collum and displays in the output
@@ -299,7 +305,14 @@ b as (
 
 select *
 from a cross join b;
+-----------------------------------------------------------------------------------------------------------------------
+FULL OUTER JOIN
 
+The FULL OUTER JOIN keyword returns all records when there is a match in left (table1) or right (table2) table records.
+
+A palavra-chave FULL OUTER JOIN retorna todos os registros correspondentes de ambas as tabelas, independentemente da outra tabela 
+corresponder ou não. Portanto,se houver linhas em "Clientes"que não tenham correspondências em "Pedidos", ou se houver linhas
+em "Pedidos" que não tenham correspondências em "Clientes", essas linhas também serão listadas.
 
 
 
