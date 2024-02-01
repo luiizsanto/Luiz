@@ -1,0 +1,304 @@
+Big Querry - Armazenamento de dados dados 
+SQL (Structured Query Language) - linguagem de programação para armazenar e processar informações de um banco de dados
+Access: console.cloud.google.com/bigquery
+É possível acessae dados públicos
+
+Comandos:
+-----------------------------------------------------------------------------------------------------------------------
+SELECT - select a collum and displays in the output
+  SELECT * - produces one output column for each column that is visible after executing the full query 
+  SELECT * EXCEPT
+  SELECT * REPLACE
+  SELECT DISTINCT
+  SELECT ALL - statement returns all rows, including duplicate rows
+  STRUCT 
+  ARRAY
+  SELECT AS VALUE
+  FROM
+UNNEST
+
+CTE (comom table expression) - tabela virtual
+  recorrente
+  não recorrente
+-----------------------------------------------------------------------------------------------------------------------
+#SELECT COMMON 
+
+WITH
+produce AS (
+  SELECT 
+    'apple' as fruit,
+    'spinach' as vegetable
+)
+
+# Option-1
+/*
+SELECT * 
+from produce
+*/
+
+# Option-2
+/*
+select 
+  fruit,
+  vegetable
+from produce
+*/
+
+# Option-3
+/*
+Select 
+  p.fruit,
+  p.vegetable 
+From produce as p
+*/
+
+# option-4
+Select 
+  produce.fruit,
+  produce.vegetable 
+From produce
+;
+-----------------------------------------------------------------------------------------------------------------------
+# SELECT * EXCEPT
+Aciona a tabela, com as exceções indicadas
+
+WITH
+cake as (
+  select
+    'vanilla' as flavor,
+    100 as sugar_gm,
+    200 as flour_gm
+)
+
+select * except(sugar_gm)
+from cake
+-----------------------------------------------------------------------------------------------------------------------
+#SELECT * REPLACE
+Substitui um valor 
+
+WITH
+cake as (
+  select
+    'vanilla' as flavor,
+    100 as sugar_gm,
+    200 as flour_gm
+)
+#select * replace ('chocolate' as flavor)
+select * replace(sugar_gm*2 as sugar_gm)
+from cake
+;
+-----------------------------------------------------------------------------------------------------------------------
+SELECT DISTINCT
+Filtra as linhas iguais
+
+WITH
+animals as (
+  select 'dog' as type_of_animal, 30 as weitht_lb
+  union all
+  select 'dog' as type_of_animal, 15 as weitht_lb
+  union all
+  select 'cat' as type_of_animal, 20 as weitht_lb
+  union all
+  select 'cat' as type_of_animal, 20 as weitht_lb
+)
+
+select distinct *
+from animals
+;
+-----------------------------------------------------------------------------------------------------------------------
+SELECT ALL
+Statement returns all rows, including duplicate rows 
+
+WITH
+animals as (
+  select 'dog' as animal, 'fish' as food
+  union all
+  select 'dog' as animal, 'fish' as food
+  union all
+  select 'cat' as animal, 'bone' as food
+)
+select all *
+from animals
+;
+-----------------------------------------------------------------------------------------------------------------------
+STRUCT 
+select struct <x int64>(1) as number;
+select struct <w string>('abc') as word;
+select struct <dt date>('2022-09-06') as word;
+
+select struct <i int64, s struct <w string>>(1,struct('abc')) as nested_struct;
+-----------------------------------------------------------------------------------------------------------------------
+ARRAY
+
+SELECT array<boolean>[TRUE, FALSE, FALSE, TRUE] AS bool; 
+-----------------------------------------------------------------------------------------------------------------------
+SELECT AS VALUE
+
+SELECT STRUCT(1 AS a, 2 AS b);
+SELECT AS value (STRUCT (1 AS a, 2 AS b));
+-----------------------------------------------------------------------------------------------------------------------
+FROM
+/*
+Instructions for use: 
+FROM 'project.data set.name of the table'
+*/
+
+WITH
+fruits as (
+  select 'mango' as name, 100 weight_gm
+  union all 
+  select 'orange', 120 
+)
+select *
+from fruits 
+;
+-----------------------------------------------------------------------------------------------------------------------
+UNNEST
+Retorna uma tabela de resultados que inclui uma linha para cada elemento da matriz especificada
+Convert arrays to rows
+
+/*
+#1 example 
+#SELECT * 
+#FROM UNNEST ([10,20,30]) AS NUMBERS WITH OFFSET;
+
+#2 example
+select *
+from unnest ([(1,11,'x'),(2,22,'y'),(3,33,'z')]);
+*/
+
+SELECT *
+FROM UNNEST([
+  STRUCT(1.0 AS x, 'dog' AS y),
+  STRUCT(0.3, 'cat')
+]) AS t;
+-----------------------------------------------------------------------------------------------------------------------
+UNNEST, ARRAY, STRUCT
+
+#1 
+SELECT *
+FROM UNNEST (ARRAY<STRUCT<x INT64, y STRING>>[(11,'dog'),(2,'cat')]);
+
+#2 
+Select *, struct_value
+from unnest(array<struct<x int64, y STRING>>[(11,'goo'),(2,'bar')]) as struct_value;
+-----------------------------------------------------------------------------------------------------------------------
+PIVOT and UNPIVOT
+PIVOT gira uma expressão com valor de tabela ao transformar os valores exclusivos de uma coluna na expressão em várias colunas na saída. 
+E PIVOT executa agregações em que elas são necessárias em quaisquer valores de coluna remanescentes que forem desejados na saída final. 
+UNPIVOT executa a operação oposta à PIVOT, transformando as colunas de uma expressão com valor de tabela em valores de coluna.
+-----------------------------------------------------------------------------------------------------------------------
+PIVOT
+
+WITH produce AS (
+  SELECT 'Luiz' as product, 51 as sales, 'Q1' as quarter, 2020 as year UNION ALL
+  SELECT 'Luiz', 23, 'Q2',2020 UNION ALL
+  SELECT 'Luiz', 32, 'Q3',2020 UNION ALL
+  SELECT 'Luiz', 23, 'Q4',2020 UNION ALL
+  SELECT 'Luiz', 20, 'Q1',2021 UNION ALL
+  SELECT 'Luiz', 2, 'Q2',2021 UNION ALL
+  SELECT 'Mari', 0, 'Q1',2020 UNION ALL
+  SELECT 'Mari', 5, 'Q2',2020 UNION ALL
+  SELECT 'Mari', 1, 'Q1',2021 
+)
+SELECT *
+FROM (
+  SELECT product, quarter, sales, year
+  FROM produce
+)
+PIVOT (
+  #SUM(sales) FOR quarter IN ('Q1' AS Q1, 'Q2' AS Q2, 'Q3' AS Q3, 'Q4' AS Q4)
+  SUM(sales) FOR quarter IN ('Q1', 'Q2', 'Q3', 'Q4')
+);
+-----------------------------------------------------------------------------------------------------------------------
+UNPIVOT
+WITH
+produce as (
+  select 'Luiz' as product, 51 as Q1, 23 as Q2, 45 as Q3, 3 as Q4
+  UNION ALL
+  select 'apple', 77, 0, 25, 2
+)
+
+/*
+#1 <--- the Qs are differents columns
+select *
+from produce
+
+#2 <--- put all the Qs in a only column 
+select *
+from produce
+UNPIVOT(sales for quarter in (Q1, Q2, Q3, Q4)) #<-- don't need quotes because Qs are the col names
+;
+
+#3 <--- get the quarters and and transform it into semester
+select *
+from produce
+unpivot(
+  (first_half_sales, second_half_sales)
+  for semesters
+  in ((Q1, Q2)as 'semester_1',
+      (Q3, Q4) as 'semester_2'
+  )
+)
+*/
+-----------------------------------------------------------------------------------------------------------------------
+TABLESAMPLE
+
+Introduced in SQL Server 2015 TABLESAMPLE is a clause for a query which can be used to select a 
+pseudo-random number of rows from a table, based upon a percentage or a number of rows and an optional seed number – 
+if a repeatable result is required. It can only be used against local tables.
+
+EXEMPLE 1:
+#It doesn't work with temporary tables from WITH statement 
+select 
+  country_code,
+  date,
+  new_confirmed
+  from 'bigquery-public-data.covid19_open_data.covid19_open_data' 
+  TABLESAMPLE system(1 percent)
+;
+
+-----------------------------------------------------------------------------------------------------------------------
+INNER JOIN
+The INNER JOIN keyword selects records that have matching values in both tables.
+WITH
+a as (
+  select *
+  from unnest(array<struct<w int64, z string>>[(1,'a'),(2,'b'),(3,'c'),(4,'d')])
+),
+b as (
+  select *
+  from unnest(array<struct<y int64, z string>>[(2,'k'),(3,'m'),(3,'n'),(4,'p')])
+)
+
+/*
+#1
+select * from A
+;
+
+#2 o output é uma tabela com wy,x,z
+select *
+from a
+  inner join b on a.w = b.y
+  ;
+*/
+-----------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
