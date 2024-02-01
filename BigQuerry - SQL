@@ -283,7 +283,22 @@ from a
   ;
 */
 -----------------------------------------------------------------------------------------------------------------------
+CROSS JOIN
+Used to combine each row of one table with each row of another table,
+and return the Cartesian product of the sets of rows from the tables that are joined
 
+WITH
+a as (
+  select *
+  from unnest(array<struct<w int64, x string>>[(1,'a'),(2,'b')])
+),
+b as (
+  select *
+  from unnest(array<struct<y int64, z string>>[(2,'k'),(3,'m')])
+)
+
+select *
+from a cross join b;
 
 
 
