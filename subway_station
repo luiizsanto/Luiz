@@ -117,7 +117,41 @@ GROUP BY weekday # Agrupa os resultados pelo valor da coluna 'weekday'.
 ORDER BY count_unique_trip_id # Ordena os resultados pelo número de 'trip_ids' únicos em ordem crescente.
 ;
 ------------------------------------------------------------------------------------------------------------
+# What destination stations have the highest or lowest trip_ids?
 
+SELECT 
+  stop_headsign,
+  count(distinct trip_id) as count_unique_trip_id
+FROM `bigquery-public-data.new_york_subway.stop_times`
+GROUP BY stop_headsign
+ORDER BY count_unique_trip_id
+limit 10
+;
+------------------------------------------------------------------------------------------------------------
+# Find distinct station entrance_type
+SELECT distinct entrance_type
+FROM `bigquery-public-data.new_york_subway.station_entrances`
+------------------------------------------------------------------------------------------------------------
+# What stations have all or 5, 4, 3, 2 entrance types?
+# Seleciona as estações e a contagem de tipos de entrada distintos para cada estação,
+# filtrando aquelas que têm pelo menos 2 tipos de entrada.
+SELECT DISTINCT
+  count(distinct entrance_type) AS count_unique_entrance_type,
+  station_name
+FROM `bigquery-public-data.new_york_subway.station_entrances`
+-- Agrupa os resultados pelo nome da entrada da estação.
+GROUP BY station_name
+-- Filtra as estações que têm pelo menos 2 tipos de entrada.
+HAVING count_unique_entrance_type >= 2
+-- Ordena os resultados pela contagem de tipos de entrada distintos em ordem decrescente.
+ORDER BY count_unique_entrance_type DESC;
+------------------------------------------------------------------------------------------------------------
+#Did the number of passengers at 59 St increase from 2013 to 2018?
+select *
+from `bigquery-public-data.new_york_subway.subway_ridership_2013_present`
+where regexp_contains(station_name, r'59 St')
+limit 10
+;
 
 
 
