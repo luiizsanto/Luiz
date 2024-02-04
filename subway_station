@@ -30,5 +30,45 @@ What type of car are more prone to breakdown?
 what stations have wheelschair acces and elevators?
 Whats is the passengers capacity of each train?
 
+------------------------------------------------------------------------------------------------------------
+antepenúltimo vídeo
+
+# --1--
+#get a simple time diferrence 
+
+select 
+  arrival_time,
+  departure_time,
+  time_diff(departure_time, arrival_time, minute) as t_diff1
+from(
+select
+  time "23:30:00" as arrival_time,
+  time "23:35:00" as departure_time,
+)
+;
+
+# --2--
+select 
+  arrival_time,
+  departure_time,
+  time_diff(cast(departure_time as time), cast(arrival_time as time), minute) as t_diff1
+from(
+  select *
+  from `bigquery-public-data.new_york_subway.stop_times`
+  #where regexp_contains(arrival)
+  LIMIT 10
+)
+;
+------------------------------------------------------------------------------------------------------------
+penúltimo vídeo
+
+Join tables: stop_times, trips and routes
+
+select count(distinct trip_id)
+from `bigquery-public-data.new_york_subway.trips`
+
+Resultado: 19640 #number of trip IDs
+
+
 
 
