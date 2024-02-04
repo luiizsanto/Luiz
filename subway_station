@@ -68,6 +68,57 @@ select count(distinct trip_id)
 from `bigquery-public-data.new_york_subway.trips`
 
 Resultado: 19640 #number of trip IDs
+------------------------------------------------------------------------------------------------------------
+#QUESTIONS
+------------------------------------------------------------------------------------------------------------
+# How many unique route_ids are there? 
+select count(distinct route_id) as count_unique_route_id
+from `bigquery-public-data.new_york_subway.routes`
+;
+# Answer: 30
+------------------------------------------------------------------------------------------------------------
+# What route_id has the highest count of trip_ids? What route is busiest? (qual rota tem o maior número de viagens distintas)
+select
+route_id,
+count(distinct trip_id) as count_unique_trip_id
+from `bigquery-public-data.new_york_subway.trips`
+group by route_id
+order by count_unique_trip_id
+;
+# Answer: rota 7, com 1320 count_unique_trip_id - ver no mapa qual é a linha 7
+------------------------------------------------------------------------------------------------------------
+# What is the count of trip_ids for a route type?
+select
+route_type,
+count(distinct trip_id) as count_unique_trip_id
+from `bigquery-public-data.new_york_subway.trips`
+  inner join `bigquery-public-data.new_york_subway.routes` using (route_id)
+group by route_type
+order by count_unique_trip_id
+;
+# Essa consulta fornece a contagem de trip_ids distintos para cada tipo de rota (route_type), ajudando a entender a distribuição da atividade de viagem com base nos tipos de rotas no sistema de metrô de Nova York.
+# existem apenas dois tipos de rotas, uma delas tem mais trip id único do que a outra
+------------------------------------------------------------------------------------------------------------
+# What day of a week are the trips highest or lowest? propotion of trip for week
+# Example: "ASP19GEN-1037-Sunday-00_081250_1..N03R" - we need a SUBSTRING to get the day of the week 
+# Expression: REGEXP_SUBSTR(value,regex)
+# REGEXP_SUBSTR(trip_id,r"\d+-(.*)-") #expression to get the day and the number before the date using 
+
+SELECT
+  weekday, # Seleciona a coluna 'weekday' resultante da subconsulta.
+  COUNT(DISTINCT trip_id) AS count_unique_trip_id # Conta o número distinto de 'trip_id' para cada 'weekday'.
+FROM (
+  SELECT
+    *,
+    REGEXP_SUBSTR(trip_id, r"\d+-([A-Za-z]+)-") AS weekday # Extrai o dia da semana da coluna 'trip_id' usando expressão regular e atribui a uma coluna chamada 'weekday'.
+  FROM `bigquery-public-data.new_york_subway.trips`
+)
+GROUP BY weekday # Agrupa os resultados pelo valor da coluna 'weekday'.
+ORDER BY count_unique_trip_id # Ordena os resultados pelo número de 'trip_ids' únicos em ordem crescente.
+;
+------------------------------------------------------------------------------------------------------------
+
+
 
 
 
