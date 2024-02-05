@@ -976,7 +976,9 @@ BEGIN
 END;
 
 ----------------------------------------------------------------------------------------------------
+API - Application Programming Interface
 
+Ponte que faz a conexão entre diferentes softwares 
 
 
 
