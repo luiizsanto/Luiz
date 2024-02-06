@@ -1,8 +1,6 @@
-TÓPICOS A SEREM TRATADOS
+# EXERCÍCIOS SIMPLES SQL
 
-# Exercícios simples SQL
-
-## Exercício 1
+# Exercício 1
 
 Você é Analista de Customer Experience (Experiência do Cliente) e precisa criar um relatório com os 100 primeiros clientes da história da empresa.
 Esses clientes receberão uma placa em reconhecimento à confiança dada.
@@ -47,14 +45,13 @@ ORDER BY
 	COUNT(DepartmentName) DESC
 	;
 ----------------------------------------------------------------------------------------------------------------
-/*
-EXERCÍCIO 1. Você é responsável por controlar os dados de clientes e produtos da sua empresa.
+# EXERCÍCIO 4
+
+Você é responsável por controlar os dados de clientes e produtos da sua empresa.
 o que você precisará fazer é confirmar se:
 
 a. Existem 2517 produtos cadastrados na base, e se não tiver, vc deverá reportar ao seu gestor para saber se existe alguma defasagem no controle de produtos.
-
 b. Até mês passado, a empresa tinha um total de 19500 clientes na base de controle. Verifique se esse número aumentou ou reduziu.
-*/
 
 -- a.
 Select distinct ProductKey FROM DimProduct
@@ -65,7 +62,7 @@ select * from DimCustomer; -- o número de linhas é menor, portanto temos menos
 ----------------------------------------------------------------------------------------------------------------
 # Integração Python 
 
---  NO SQL:
+# NO SQL:
 
 CREATE DATABASE PythonSQL         -- criar banco de dados
 #########################################
@@ -86,10 +83,11 @@ INSERT INTO Vendas(id_venda, cliente, produto, data_venda, preco, quantidade)   
 VALUES
     (1, 'Luiz', 'celular', '16/02/2021', 7000, 1)
 #########################################
-AGORA EM PYTHON:
+
+# NO PYTHON:
 
 import pyodbc
--- nterface de programação que permite a comunicação entre aplicativos escritos em Python e bancos de dados 
+-- Interface de programação que permite a comunicação entre aplicativos escritos em Python e bancos de dados 
 
 dados_conexao = (
     "Driver={SQL Server};"
@@ -122,7 +120,7 @@ Youtube channel: Marketing Analytics with OWOX: https://www.youtube.com/@marketi
 
 import os
 from google.cloud import bigquery
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'luiz-560' # NOME ERRADOOO
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'luiz-560'           # "luiz-560" é o nome errado
 
 client = bigquery.Client()
 
@@ -135,6 +133,4 @@ limit 50
 query_job = client.query(sql_query)
 for row in query_job.result():
     print(row)
-
-
 ----------------------------------------------------------------------------------------------------------------
