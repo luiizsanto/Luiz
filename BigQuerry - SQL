@@ -64,7 +64,7 @@ Select
 From produce
 ;
 -----------------------------------------------------------------------------------------------------------------------
-# SELECT * EXCEPT
+SELECT * EXCEPT
 Aciona a tabela, com as exceções indicadas
 
 WITH
@@ -78,7 +78,7 @@ cake as (
 select * except(sugar_gm)
 from cake
 -----------------------------------------------------------------------------------------------------------------------
-#SELECT * REPLACE
+SELECT * REPLACE
 Substitui um valor 
 
 WITH
@@ -133,7 +133,7 @@ select struct <dt date>('2022-09-06') as word;
 
 select struct <i int64, s struct <w string>>(1,struct('abc')) as nested_struct;
 -----------------------------------------------------------------------------------------------------------------------
-ARRAY
+ARRAY - estrutura de dados que armazena uma coleção de elementos, cada um identificado por um índice ou chave
 
 SELECT array<boolean>[TRUE, FALSE, FALSE, TRUE] AS bool; 
 -----------------------------------------------------------------------------------------------------------------------
@@ -142,11 +142,10 @@ SELECT AS VALUE
 SELECT STRUCT(1 AS a, 2 AS b);
 SELECT AS value (STRUCT (1 AS a, 2 AS b));
 -----------------------------------------------------------------------------------------------------------------------
-FROM
-/*
+FROM - 
+
 Instructions for use: 
 FROM 'project.data set.name of the table'
-*/
 
 WITH
 fruits as (
