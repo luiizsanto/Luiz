@@ -111,33 +111,30 @@ VALUES
 
 cursor.execute(comando) #executar o comando
 cursor.commit() # adicionar a mudança
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+----------------------------------------------------------------------------------------------------------------
 # Integração Excel
 
-# Teste de uma API 
+Youtube channel: Marketing Analytics with OWOX: https://www.youtube.com/@marketinganalyticswithowox2118
 
-# SQL em BI
+# OWOX BI (Business Intelligence) é uma plataforma que oferece recursos avançados de análise de dados e visualização para ajudar as empresas a obter insights significativos a partir de suas informações.
+----------------------------------------------------------------------------------------------------------------
+# Teste de uma API (SQL - Python)
 
-# ORGANIZAR TODO O CADERNO DE ESTUDOS
+import os
+from google.cloud import bigquery
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'luiz-560' # NOME ERRADOOO
+
+client = bigquery.Client()
+
+sql_query = """
+select station_id, name, dockcount
+from `bigquery-public-data.san_francisco.bikeshare_stations`
+limit 50
+"""
+
+query_job = client.query(sql_query)
+for row in query_job.result():
+    print(row)
+
+
+----------------------------------------------------------------------------------------------------------------
